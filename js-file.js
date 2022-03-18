@@ -22,8 +22,8 @@ const operate = function(operator, num1, num2) {
 }
 
 const populate = function(a) {
-    document.querySelector('#displaynum').textContent = a + document.querySelector('#displaynum').textContent;
+    document.querySelector('#displaynum').textContent = document.querySelector('#displaynum').textContent + this.textContent;
 }
 
-document.querySelectorAll('.number').forEach(number => number.addEventListener('click', populate(number.textContent)));
+document.querySelectorAll('.number').forEach(number => number.addEventListener('click', populate));
 
