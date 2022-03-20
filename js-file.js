@@ -23,13 +23,13 @@ const operate = function(operator, num1, num2) {
 
 let displayValue = '0';
 let op;
-let num1;
+let num1 = 0;
 let num2;
 
 const round = function(num) {
     return (num.toString().length > 14) ? 
         num.toExponential(2) :
-        num
+        num;
 }
 
 const limit = function(displayNum, pressedNum) {
@@ -37,86 +37,179 @@ const limit = function(displayNum, pressedNum) {
         displayNum :
         displayNum+pressedNum;
 }
-const populate = function(e) {
-    if (displayValue == '0' && !num2) {
-        displayValue = e.target.textContent;
-        document.querySelector('#displaynum').textContent = displayValue;
-    }
-    else if (num1 && op && !num2) {
-        displayValue = e.target.textContent;
-        num2 = Number(e.target.textContent);
-        document.querySelector('#displaynum').textContent = displayValue;
-    }
-    else if (num1 && op && num2) {
-            displayValue = limit(document.querySelector('#displaynum').textContent, e.target.textContent);
-
-        num2 = Number(displayValue);
-        document.querySelector('#displaynum').textContent = displayValue;
-    }
-    else {
-        displayValue = limit(document.querySelector('#displaynum').textContent, e.target.textContent);
-        document.querySelector('#displaynum').textContent = displayValue
-    }
-}
-
-document.querySelector('#clear').addEventListener('click', 
-function(e) {
-    displayValue = '0';
-    op = undefined;
-    num1 = undefined;
-    num2 = undefined;
-    document.querySelector('#displaynum').textContent = displayValue;
-})
-
-document.querySelectorAll('.number').forEach(number => number.addEventListener('click', populate));
-
-document.querySelectorAll('.operator').forEach(operator => operator.addEventListener('click', 
-function(e) {
-    if (!op && !num1) {
-        num1 = Number(displayValue);
-        op = e.target.textContent;
-    }
-    else if (op && num1 && !num2){
-        num1 = operate(op, num1, num1); 
-        displayValue = num1.toString();
-        document.querySelector('#displaynum').textContent = displayValue;
-    }
-    else if (!num2 && !op) {
-        op = e.target.textContent;
-    }
-    else {
-        num1 = operate(op, num1, num2); 
-        displayValue = num1.toString();
-        document.querySelector('#displaynum').textContent = displayValue;
-        op = e.target.textContent;
-        num2 = undefined;
-    }
-}));
-
-document.querySelector('#equals').addEventListener('click', 
-function() {
-    if (op != undefined && num1 != undefined && num2 != undefined) {
-        console.log([num1,num2,op]);
-        if (op == '/' && num2 == 0) {
-            console.log("Hi");
+const handleEqualsPress = function() {
+    if (op != null && num1 != null && displayValue != num1) {
+        if (op == '/' && displayValue == 0) {
             displayValue = 'Can\'t divide!';
-            console.log(displayValue);
             document.querySelector('#displaynum').textContent = displayValue;
         }
         else {
-            num1 = operate(op, num1, num2);
-            displayValue = num1.toString();
-            op = undefined;
-            num2 = undefined;
+            num2 = displayValue;
+            result = operate(op, num1, num2);
+            displayValue = result.toString();
+            if (displayValue.includes('.')) document.querySelector('#decimalpt').disabled = true;
+            op = null;
+            num1 = result;
+            num2 = 0;
             document.querySelector('#displaynum').textContent = displayValue;
         }
     }
-    else if (op != undefined && num1 != undefined && !num2){
-        num1 = operate(op, num1, num1); 
-        displayValue = num1.toString();
-        op = undefined;
+    else if (op != null && num1 != null && displayValue == num1) {
+        result = operate(op, num1, num1); 
+        displayValue = result.toString();
+        op = null;
+        num1 = result;
         document.querySelector('#displaynum').textContent = displayValue;
     }
 }
-);
 
+const handleDecimalPtPress = function() {
+    if (op == null && num1 == 0 && num2 == null) {
+        displayValue = limit(displayValue, '.');
+        if (displayValue.includes('.')) document.querySelector('#decimalpt').disabled = true;
+        document.querySelector('#displaynum').textContent = displayValue; 
+    }
+    else {
+        displayValue = limit(displayValue, '.');
+        if (displayValue.includes('.')) document.querySelector('#decimalpt').disabled = true;        
+        document.querySelector('#displaynum').textContent = displayValue; 
+    }
+}
+const handleBackspacePress = function() {
+    if (displayValue.length == 1) {
+        if (displayValue != 0) {
+            displayValue = '0';
+            document.querySelector('#displaynum').textContent = displayValue;
+        }
+    }
+    else {
+        if (displayValue.charAt(displayValue.length-1) == '.') {
+            document.querySelector('#decimalpt').disabled = false;
+        }
+        displayValue = displayValue.slice(0,displayValue.length-1);
+        document.querySelector('#displaynum').textContent = displayValue;
+    }
+}
+
+document.querySelector('#clear').addEventListener('click', function(e) {
+    document.querySelector('#decimalpt').disabled = false;
+    displayValue = '0';
+    op = null;
+    num1 = 0;
+    num2 = 0;
+    document.querySelector('#displaynum').textContent = displayValue;
+    document.querySelector('#clear').blur();
+});
+
+document.querySelector('#delete').addEventListener('click', handleBackspacePress);
+
+document.querySelectorAll('.number').forEach(number => number.addEventListener('click', function(e) {
+    if (!op) {
+        if (displayValue == '0' || displayValue == num1) {
+            displayValue = e.target.textContent;
+            document.querySelector('#displaynum').textContent = displayValue;
+        }
+        else {
+            displayValue = limit(document.querySelector('#displaynum').textContent, e.target.textContent);
+            document.querySelector('#displaynum').textContent = displayValue;
+        }
+    }
+    else {
+        if (displayValue == num1) {
+            displayValue = e.target.textContent;
+            document.querySelector('#displaynum').textContent = displayValue;
+        }
+        else if (displayValue != num1) {
+            displayValue = limit(document.querySelector('#displaynum').textContent, e.target.textContent);
+            document.querySelector('#displaynum').textContent = displayValue;
+        }
+    }
+}));
+
+document.querySelectorAll('.operator').forEach(operator => operator.addEventListener('click', function(e) {
+    document.querySelector('#decimalpt').disabled = false;
+    if (!op) {
+        num1 = Number(displayValue);
+        op = e.target.textContent;
+    }
+    else if (op != null && num1 != null && displayValue == num1) {
+        num1 = operate(op, num1, num1); 
+        displayValue = num1.toString();
+        document.querySelector('#displaynum').textContent = displayValue;
+        op = e.target.textContent;
+    }
+    else if (op != null && num1 != null && displayValue != num1) {
+        if (op == '/' && displayValue == 0) {
+            displayValue = 'Can\'t divide!';
+            document.querySelector('#displaynum').textContent = displayValue;
+        }
+        else {
+            num2 = displayValue;
+            num1 = operate(op, num1, num2); 
+            displayValue = num1.toString();
+            document.querySelector('#displaynum').textContent = displayValue;
+            op = e.target.textContent;
+            num2 = 0;
+        }
+    }
+}));
+
+document.querySelector('#equals').addEventListener('click', handleEqualsPress);
+
+document.querySelector('#decimalpt').addEventListener('click', handleDecimalPtPress);
+
+document.addEventListener('keydown', function(e) {
+    if (e.key == 'Backspace') handleBackspacePress();
+    else if (e.key == '=' || e.key == 'Enter') handleEqualsPress();
+    else if (e.key == '.') handleDecimalPtPress();
+    else if (['+','-','*','/'].includes(e.key)) {
+        document.querySelector('#decimalpt').disabled = false;
+        if (!op) {
+            num1 = Number(displayValue);
+            op = e.key;
+        }
+        else if (op != null && num1 != null && displayValue == num1) {
+            num1 = operate(op, num1, num1); 
+            displayValue = num1.toString();
+            document.querySelector('#displaynum').textContent = displayValue;
+            op = e.key;
+        }
+        else if (op != null && num1 != null && displayValue != num1) {
+            if (op == '/' && displayValue == 0) {
+                displayValue = 'Can\'t divide!';
+                document.querySelector('#displaynum').textContent = displayValue;
+            }
+            else {
+                num2 = displayValue;
+                num1 = operate(op, num1, num2); 
+                displayValue = num1.toString();
+                document.querySelector('#displaynum').textContent = displayValue;
+                op = e.key;
+                num2 = 0;
+            }
+        }
+    }
+    else if (['0','1','2','3','4','5','6','7','8','9'].includes(e.key)) {
+        if (!op) {
+            if (displayValue == '0' || (displayValue == num1 && num2 == 0)) {
+                displayValue = e.key;
+                document.querySelector('#displaynum').textContent = displayValue;
+            }
+            else {
+                displayValue = limit(document.querySelector('#displaynum').textContent, e.key);
+                document.querySelector('#displaynum').textContent = displayValue;
+            }
+        }
+        else {
+            if (displayValue == num1) {
+                displayValue = e.key;
+                document.querySelector('#displaynum').textContent = displayValue;
+            }
+            else if (displayValue != num1) {
+                displayValue = limit(document.querySelector('#displaynum').textContent, e.key);
+                document.querySelector('#displaynum').textContent = displayValue;
+            }
+        }
+
+    }
+})

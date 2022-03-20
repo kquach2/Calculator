@@ -66,3 +66,13 @@ button {
 #decimalpt {
     line-height: 65px;
 }
+
+#delete {
+    width: 165.625px;
+    height: 80px;
+}
+
+#clear {
+    width: 165.625px;
+    height: 80px;
+}
