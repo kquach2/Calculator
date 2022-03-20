@@ -24,7 +24,7 @@ const operate = function(operator, num1, num2) {
 let displayValue = '0';
 let op;
 let num1 = 0;
-let num2;
+let num2 = 0;
 
 const round = function(num) {
     return (num.toString().length > 14) ? 
@@ -104,8 +104,8 @@ document.querySelector('#clear').addEventListener('click', function(e) {
 document.querySelector('#delete').addEventListener('click', handleBackspacePress);
 
 document.querySelectorAll('.number').forEach(number => number.addEventListener('click', function(e) {
-    if (!op) {
-        if (displayValue == '0' || displayValue == num1) {
+    if (!op) { // generating num1
+        if (displayValue == '0' || (displayValue == num1)) {
             displayValue = e.target.textContent;
             document.querySelector('#displaynum').textContent = displayValue;
         }
@@ -114,12 +114,13 @@ document.querySelectorAll('.number').forEach(number => number.addEventListener('
             document.querySelector('#displaynum').textContent = displayValue;
         }
     }
-    else {
-        if (displayValue == num1) {
+    else { // generating num2
+        if (num2 == 0) {
             displayValue = e.target.textContent;
             document.querySelector('#displaynum').textContent = displayValue;
+            num2 = Number(displayValue);
         }
-        else if (displayValue != num1) {
+        else {
             displayValue = limit(document.querySelector('#displaynum').textContent, e.target.textContent);
             document.querySelector('#displaynum').textContent = displayValue;
         }
@@ -169,10 +170,12 @@ document.addEventListener('keydown', function(e) {
             op = e.key;
         }
         else if (op != null && num1 != null && displayValue == num1) {
+            console.log('yaabo')
             num1 = operate(op, num1, num1); 
             displayValue = num1.toString();
             document.querySelector('#displaynum').textContent = displayValue;
             op = e.key;
+            num2 = 0;
         }
         else if (op != null && num1 != null && displayValue != num1) {
             if (op == '/' && displayValue == 0) {
@@ -180,6 +183,7 @@ document.addEventListener('keydown', function(e) {
                 document.querySelector('#displaynum').textContent = displayValue;
             }
             else {
+                console.log('general kenobi')
                 num2 = displayValue;
                 num1 = operate(op, num1, num2); 
                 displayValue = num1.toString();
@@ -190,8 +194,8 @@ document.addEventListener('keydown', function(e) {
         }
     }
     else if (['0','1','2','3','4','5','6','7','8','9'].includes(e.key)) {
-        if (!op) {
-            if (displayValue == '0' || (displayValue == num1 && num2 == 0)) {
+        if (!op) { // generating num1
+            if (displayValue == '0' || (displayValue == num1)) {
                 displayValue = e.key;
                 document.querySelector('#displaynum').textContent = displayValue;
             }
@@ -200,16 +204,17 @@ document.addEventListener('keydown', function(e) {
                 document.querySelector('#displaynum').textContent = displayValue;
             }
         }
-        else {
-            if (displayValue == num1) {
+        else { // generating num2
+            if (num2 == 0) {
                 displayValue = e.key;
                 document.querySelector('#displaynum').textContent = displayValue;
+                num2 = Number(displayValue);
             }
-            else if (displayValue != num1) {
+            else {
+                console.log('yahoo')
                 displayValue = limit(document.querySelector('#displaynum').textContent, e.key);
                 document.querySelector('#displaynum').textContent = displayValue;
             }
         }
-
     }
 })
