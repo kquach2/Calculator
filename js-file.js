@@ -138,6 +138,7 @@ document.querySelectorAll('.operator').forEach(operator => operator.addEventList
         displayValue = num1.toString();
         document.querySelector('#displaynum').textContent = displayValue;
         op = e.target.textContent;
+        num2 = 0;
     }
     else if (op != null && num1 != null && displayValue != num1) {
         if (op == '/' && displayValue == 0) {
