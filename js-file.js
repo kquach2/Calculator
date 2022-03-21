@@ -59,6 +59,7 @@ const handleEqualsPress = function() {
         displayValue = result.toString();
         op = null;
         num1 = result;
+        num2 = 0;
         document.querySelector('#displaynum').textContent = displayValue;
     }
 }
