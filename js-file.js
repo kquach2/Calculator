@@ -64,15 +64,12 @@ const handleEqualsPress = function() {
 }
 
 const handleDecimalPtPress = function() {
-    if (op == null && num1 == 0 && num2 == null) {
+    if (!displayValue.includes('.') && document.querySelector('#decimalpt').disabled == false) {
         displayValue = limit(displayValue, '.');
-        if (displayValue.includes('.')) document.querySelector('#decimalpt').disabled = true;
-        document.querySelector('#displaynum').textContent = displayValue; 
-    }
-    else {
-        displayValue = limit(displayValue, '.');
-        if (displayValue.includes('.')) document.querySelector('#decimalpt').disabled = true;        
-        document.querySelector('#displaynum').textContent = displayValue; 
+        if (displayValue.includes('.')) {
+            document.querySelector('#decimalpt').disabled = true;
+            document.querySelector('#displaynum').textContent = displayValue; 
+        }
     }
 }
 const handleBackspacePress = function() {
@@ -119,6 +116,7 @@ document.querySelectorAll('.number').forEach(number => number.addEventListener('
             displayValue = e.target.textContent;
             document.querySelector('#displaynum').textContent = displayValue;
             num2 = Number(displayValue);
+            document.querySelector('#decimalpt').disabled = false;
         }
         else {
             displayValue = limit(document.querySelector('#displaynum').textContent, e.target.textContent);
@@ -128,7 +126,6 @@ document.querySelectorAll('.number').forEach(number => number.addEventListener('
 }));
 
 document.querySelectorAll('.operator').forEach(operator => operator.addEventListener('click', function(e) {
-    document.querySelector('#decimalpt').disabled = false;
     if (!op) {
         num1 = Number(displayValue);
         op = e.target.textContent;
@@ -165,13 +162,12 @@ document.addEventListener('keydown', function(e) {
     else if (e.key == '=' || e.key == 'Enter') handleEqualsPress();
     else if (e.key == '.') handleDecimalPtPress();
     else if (['+','-','*','/'].includes(e.key)) {
-        document.querySelector('#decimalpt').disabled = false;
+        //if (displayValue.includes('.')) document.querySelector('#decimalpt').disabled = true;
         if (!op) {
             num1 = Number(displayValue);
             op = e.key;
         }
         else if (op != null && num1 != null && displayValue == num1) {
-            console.log('yaabo')
             num1 = operate(op, num1, num1); 
             displayValue = num1.toString();
             document.querySelector('#displaynum').textContent = displayValue;
@@ -184,7 +180,6 @@ document.addEventListener('keydown', function(e) {
                 document.querySelector('#displaynum').textContent = displayValue;
             }
             else {
-                console.log('general kenobi')
                 num2 = displayValue;
                 num1 = operate(op, num1, num2); 
                 displayValue = num1.toString();
@@ -210,9 +205,9 @@ document.addEventListener('keydown', function(e) {
                 displayValue = e.key;
                 document.querySelector('#displaynum').textContent = displayValue;
                 num2 = Number(displayValue);
+                document.querySelector('#decimalpt').disabled = false;
             }
             else {
-                console.log('yahoo')
                 displayValue = limit(document.querySelector('#displaynum').textContent, e.key);
                 document.querySelector('#displaynum').textContent = displayValue;
             }
